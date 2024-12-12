@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교실 자리 배치 랜덤 변경</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+        }
+
+        #classroom-container {
+            display: grid;
+            grid-template-columns: repeat(6, 100px);  /* 6명씩 1줄 */
+            grid-gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .seat {
+            width: 100px;
+            height: 100px;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBqSFjB20Hb62tiAtU4BLq79GEJpGpMufA6g&s');  /* 책상 아이콘 이미지 */
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid #999;
+            position: relative;
+        }
+
+        .seat.selected {
+            background-color: rgba(255, 153, 153, 0.8);  /* 선택된 자리는 반투명한 빨간색 배경 */
+        }
+
+        .seat span {
+            position: absolute;
+            color: rgb(0, 0, 0);
+            font-size: 14px;
+            z-index: 1;  /* 학생 이름이 책상 위에 표시되도록 */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>교실 자리 배치 랜덤 변경</h1>
+    <p>각 자리의 학생을 랜덤하게 배치할 수 있습니다. 버튼을 눌러보세요!</p>
+    
+    <div id="classroom-container">
+        <!-- 자리 배치가 여기에 표시됩니다 -->
+    </div>
+
+    <button onclick="randomizeSeats()">자리 배치 랜덤 변경</button>
+
+    <script>
+        // 30명의 학생 명단 (예시)
+        const students = [
+            "학생 1", "학생 2", "학생 3", "학생 4", "학생 5", 
+            "학생 6", "학생 7", "학생 8", "학생 9", "학생 10",
+            "학생 11", "학생 12", "학생 13", "학생 14", "학생 15",
+            "학생 16", "학생 17", "학생 18", "학생 19", "학생 20",
+            "학생 21", "학생 22", "학생 23", "학생 24", "학생 25",
+            "학생 26", "학생 27", "학생 28", "학생 29", "학생 30"
+        ];
+
+        // 교실 자리 수 (6명씩 5줄)
+        const totalSeats = 30;
+        const rows = 5;  // 줄 수
+        const cols = 6;  // 1줄에 앉는 학생 수
+
+        // 자리 배치 HTML 생성 함수
+        function generateClassroom() {
+            const classroomContainer = document.getElementById("classroom-container");
+            classroomContainer.innerHTML = '';  // 기존 내용 초기화
+
+            // 학생이 앉을 자리를 랜덤하게 생성하여 표시
+            for (let i = 0; i < totalSeats; i++) {
+                const seat = document.createElement('div');
+                seat.classList.add('seat');
+                const studentName = document.createElement('span');
+                studentName.textContent = students[i];
+                seat.appendChild(studentName);  // 자리 내에 학생 이름 추가
+                seat.id = 'seat-' + i;
+                seat.onclick = () => toggleSeatSelection(seat);
+                classroomContainer.appendChild(seat);
+            }
+        }
+
+        // 자리 배치 랜덤 변경 함수
+        function randomizeSeats() {
+            // 학생들을 랜덤으로 섞기 (Fisher-Yates Shuffle)
+            const shuffledStudents = [...students];
+            for (let i = shuffledStudents.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledStudents[i], shuffledStudents[j]] = [shuffledStudents[j], shuffledStudents[i]];
+            }
+
+            // 랜덤으로 섞은 학생들을 자리에 배치
+            const seats = document.querySelectorAll('.seat span');
+            seats.forEach((seat, index) => {
+                seat.textContent = shuffledStudents[index];
+            });
+        }
+
+        // 자리 선택/취소 토글 함수
+        function toggleSeatSelection(seat) {
+            seat.classList.toggle('selected');
+        }
+
+        // 페이지가 로드되면 초기 교실 생성
+        window.onload = generateClassroom;
+    </script>
+</body>
+</html>
